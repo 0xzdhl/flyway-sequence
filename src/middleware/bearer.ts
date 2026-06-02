@@ -2,6 +2,7 @@ import { createMiddleware } from "@tanstack/react-start";
 import type { JWTPayload } from "better-auth";
 import { verifyJwsAccessToken } from "better-auth/oauth2";
 import { env } from "#/env.ts";
+import { oauthScopes } from "#/lib/auth.ts";
 import { getAuthIssuer } from "#/lib/oauth-urls.ts";
 import { betterAuthMiddleware } from "./better-auth.ts";
 
@@ -11,7 +12,7 @@ function unauthorized() {
 	return new Response(null, {
 		status: 401,
 		headers: {
-			"WWW-Authenticate": `Bearer resource_metadata="${env.BETTER_AUTH_URL}/.well-known/oauth-protected-resource/api/mcp", scope="mcp:write"`,
+			"WWW-Authenticate": `Bearer resource_metadata="${env.BETTER_AUTH_URL}/.well-known/oauth-protected-resource/api/mcp", scope="${oauthScopes.join(' ')}"`,
 			"Access-Control-Expose-Headers": "WWW-Authenticate",
 		},
 	});

@@ -9,7 +9,7 @@ import { env } from "#/env.ts";
 const HOUR = 60 * 60;
 const DAY = 24 * HOUR;
 
-const oauthScopes = [
+export const oauthScopes = [
 	"openid",
 	"profile",
 	"email",
