@@ -6,8 +6,21 @@ import { tanstackStartCookies } from "better-auth/tanstack-start";
 import type { DBClient } from "#/db/client.ts";
 import { env } from "#/env.ts";
 
+const HOUR = 60 * 60;
+const DAY = 24 * HOUR;
+
+const oauthScopes = [
+	"openid",
+	"profile",
+	"email",
+	"offline_access",
+	"mcp:read",
+	"mcp:write",
+] as const;
+
 export function createAuthServer(db: DBClient) {
 	return betterAuth({
+		baseURL: env.BETTER_AUTH_URL,
 		database: drizzleAdapter(db, {
 			provider: "sqlite",
 		}),
@@ -28,7 +41,7 @@ export function createAuthServer(db: DBClient) {
 				loginPage: "/sign-in",
 				consentPage: "/consent",
 				validAudiences: [env.MCP_RESOURCE_URL],
-				scopes: ["openid", "profile", "email", "mcp:read", "mcp:write"],
+				scopes: [...oauthScopes],
 				allowDynamicClientRegistration: true,
 				allowUnauthenticatedClientRegistration: true,
 				clientRegistrationDefaultScopes: [
@@ -36,14 +49,12 @@ export function createAuthServer(db: DBClient) {
 					"profile",
 					"email",
 					"mcp:read",
+					"offline_access",
 				],
-				clientRegistrationAllowedScopes: [
-					"openid",
-					"profile",
-					"email",
-					"mcp:read",
-					"mcp:write",
-				],
+				clientRegistrationAllowedScopes: [...oauthScopes],
+
+				accessTokenExpiresIn: 6 * HOUR,
+				refreshTokenExpiresIn: 90 * DAY,
 			}),
 			tanstackStartCookies(),
 		],
